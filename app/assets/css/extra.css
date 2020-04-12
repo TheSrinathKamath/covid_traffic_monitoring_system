@@ -1,0 +1,40 @@
+.hashText{
+    display: inline-block;
+    margin: 5px auto;
+    cursor: pointer;
+    border: 1px solid #212529;
+    width: fit-content;
+    border-radius: 25px;
+    padding: 10px;
+}
+.hashText:focus{
+    color: red;
+    border: 1px solid red;
+}
+
+.dvTCP{
+    margin-bottom: 20px;
+}
+
+.slDrpDwn{
+    border: none;
+    outline: none;
+}
+
+/*------------------------------------------------------------------
+[ Responsive ]*/
+
+@media (max-width: 576px) {
+    
+    .dvTCP{
+        text-align: center;
+    }
+}
+@media (max-width: 992px) {
+    .hashText{
+        padding: 5px;
+    }
+    .dvTCP{
+        text-align: center;
+    }
+}

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>CheckPoint</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!--===============================================================================================-->
+    <link rel="icon" type="image/png" href="assets/images/icons/favicon.ico" />
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="assets/vendor/bootstrap/css/bootstrap.min.css">
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="assets/fonts/font-awesome-4.7.0/css/font-awesome.min.css">
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="assets/fonts/iconic/css/material-design-iconic-font.min.css">
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="assets/vendor/animate/animate.css">
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="assets/vendor/css-hamburgers/hamburgers.min.css">
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="assets/vendor/animsition/css/animsition.min.css">
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="assets/vendor/select2/select2.min.css">
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="assets/vendor/daterangepicker/daterangepicker.css">
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="assets/css/util.css">
+    <link rel="stylesheet" type="text/css" href="assets/css/main.css">
+    <link rel="stylesheet" type="text/css" href="assets/css/extra.css">
+    <!--===============================================================================================-->
+</head>
+
+<body>
+
+    <div class="limiter">
+        <div class="container-login100">
+            <div class="wrap-login100" style="width: auto !important;">
+                <form class="login100-form validate-form" id="cpForm" action="">
+
+                    <span class="login100-form-title p-b-34 p-t-27">
+                        Check Point Selection
+                    </span>
+                    <div class="container-login100-form-btn dvTCP" id="topCheckPoints" style="display: none;"></div>
+                    <div class="wrap-input100 validate-input">
+                        <select class="input100 slDrpDwn" id="cpNameList"></select>
+                        <span class="focus-input100"></span>
+                    </div>
+                    <div class="container-login100-form-btn" >
+                        <button class="login100-form-btn" type="submit" style="display: none;" id="submitBtn">
+                            Okay
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!--===============================================================================================-->
+    <script src="assets/vendor/jquery/jquery-3.2.1.min.js"></script>
+    <!--===============================================================================================-->
+    <script src="assets/vendor/animsition/js/animsition.min.js"></script>
+    <!--===============================================================================================-->
+    <script src="assets/vendor/bootstrap/js/popper.js"></script>
+    <script src="assets/vendor/bootstrap/js/bootstrap.min.js"></script>
+    <!--===============================================================================================-->
+    <script src="assets/vendor/select2/select2.min.js"></script>
+    <!--===============================================================================================-->
+    <script src="assets/vendor/daterangepicker/moment.min.js"></script>
+    <script src="assets/vendor/daterangepicker/daterangepicker.js"></script>
+    <!--===============================================================================================-->
+    <script src="assets/vendor/countdowntime/countdowntime.js"></script>
+    <!--===============================================================================================-->
+    <script src="assets/js/main.js"></script>
+    <!--===============================================================================================-->
+    <script src="assets/js/scripts.js" type="text/javascript"></script>
+    <!--===============================================================================================-->
+    <script type="text/javascript"
+        src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+    <!--===============================================================================================-->
+
+    <script>
+        window.onload = function () {
+            setTimeout(function () {
+                loadTopPoints();
+                loadAllPoints();
+            }, 100);
+        };
+        
+        var GCPID = 0;
+
+        $(document).ready(function () {
+            $('#cpForm').submit(function (event) {
+                event.preventDefault();
+
+                var officerUID = getCookie("officerUID");
+
+                $.ajax({
+                    type: 'POST',
+                    dataType: 'json',
+                    data: ({ currentCPID: GCPID, officerUID: officerUID }),
+                    url: 'assets/php/updateCheckPoint.php',
+
+                    success: function (responseData) {
+                        if (responseData.data.success == "successful") {
+
+                            userData = responseData.data.response;
+                            // console.log(userData);
+                            // alert("success!");
+                            redirect("capture.html");
+                        }
+                    }
+                });
+            })
+
+            $('select').on('change', function () {
+                var currCPID = $('#cpNameList').find('option:selected').attr('id');
+                $('.hashNames').css('border','#212529');
+                showPop(currCPID);
+            });
+        });
+
+        function showPop(passedID){
+            $("#cpNameList").prop("selectedIndex", passedID);
+            $('#submitBtn').show();
+            GCPID = passedID;
+        }
+
+        function loadTopPoints() {
+            var offUID = getCookie("officerUID");
+
+            $.ajax({
+                type: 'POST',
+                dataType: 'json',
+                data: ({ officerUID: offUID }),
+                url: 'assets/php/getTopCheckPoints.php',
+
+                success: function (responseData) {
+                    if (responseData.data.success == "successful") {
+
+                        cpData = responseData.data.response;
+
+                        cpNameArr = cpData.cpNames;
+                        cpIdArr = cpData.cpId;
+                        cpTags = '';
+                        var counter = 0;
+                        cpNameArr.forEach(element => {
+                            cpTags = cpTags + createTags(element, cpIdArr[counter++], "hashNames");
+                        });
+                        if (counter !== 0) {
+                            $('#topCheckPoints').show();
+                            $('#topCheckPoints').css('display', 'inline-block');
+                        }
+                        $('#topCheckPoints').html(cpTags);
+                    }
+                }
+            });
+
+        }
+
+        function loadAllPoints() {
+            $.ajax({
+                type: 'GET',
+                dataType: 'json',
+                url: 'assets/php/getAllPoints.php',
+
+                success: function (responseData) {
+                    if (responseData.data.success == "successful") {
+
+                        cpList = responseData.data.response;
+                        // console.log(cpList[0]);
+
+                        cpTags = "<option>-- Today's Check point --</option>";
+                        var counter = 0;
+                        cpList.forEach(element => {
+                            cpTags = cpTags + createTags(element.cpName, element.CPID, "dropNames");
+                        });
+
+                        $('#cpNameList').html(cpTags);
+                    }
+                }
+            });
+        }
+
+        function createTags(cpname, cpid, template) {
+            var HTMLstring = "";
+            switch (template) {
+                case "hashNames":
+                    HTMLstring = "<button type ='button' class='hashText' onclick='showPop(" + cpid + ")'>" + cpname + "</button>&nbsp;";
+                    break;
+                case "dropNames":
+                    HTMLstring = "<option id='" + cpid + "'>" + cpname + "</option>";
+                    break;
+            }
+            return HTMLstring;
+        }
+
+
+
+    </script>
+</body>
+
+</html>
