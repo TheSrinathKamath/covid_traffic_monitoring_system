@@ -1,2 +1,2 @@
-# covid_traffic_monitoring_system
-This is an OCR-based traffic monitoring system to track citizens &amp; vehicle traffic during covid-lockdown.
+# ALPR based Traffic Management System during COVID-19 Lockdown
+This project uses OpenCV, Python image processing integrated into a web app to detect, manage & analyse traffic data during COVID-19 lockdown. The Web app allows police officers to document traffic by just scanning the Vehicle License Plate and documenting the journey details. The app helps the police get the route map of any travelling person during the lockdown and region-wise traffic data.
